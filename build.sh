@@ -30,11 +30,13 @@ fi
 
 if ! [ -f "$MKDTBO_FILE" ]; then
 echo "Mkdtboimg not found! Wget to $MKDTBO_FILE..."
-if ! wget https://raw.githubusercontent.com/awakened1712/android_kernel_oneplus_sm8350/lineage-21/mkdtboimg.py $KERNEL_DIR; then
+if ! wget https://raw.githubusercontent.com/awakened1712/android_kernel_oneplus_sm8350/lineage-21/mkdtboimg.py -O $MKDTBO_FILE; then
 echo "Wget failed! Aborting..."
 exit 1
 fi
+chmod +x $MKDTBO_FILE
 fi
+
 
 export KBUILD_BUILD_USER=dabskutz-build-pangu
 export KBUILD_BUILD_HOST=@101026-build
