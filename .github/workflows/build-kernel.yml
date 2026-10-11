@@ -30,11 +30,15 @@ jobs:
           mkdir -p $HOME/toolchains/aosp-clang
           cd $HOME/toolchains/aosp-clang
           
-          # Menggunakan Git Partial Clone dari branch main
-          git clone --depth=1 --filter=blob:none --sparse https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86 clang-tmp
+          # Clone tanpa checkout awal agar Git otomatis mendeteksi default branch (master)
+          git clone --depth=1 --filter=blob:none --sparse --no-checkout https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86 clang-tmp
           cd clang-tmp
+          
+          # Tentukan folder yang ingin diunduh
           git sparse-checkout set clang-r547379
-          git checkout main
+          
+          # Checkout menggunakan HEAD bawaan repositori
+          git checkout
           
           # Pindahkan isi folder r547379 ke root toolchain
           mv clang-r547379/* ../
@@ -52,6 +56,6 @@ jobs:
       - name: Upload Kernel Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Salsa-Kernel-Redwood
+          name: Riss-SU-Kernel-Redwood
           path: /home/runner/AnyKernel3/*.zip
           compression-level: 0
