@@ -1,11 +1,11 @@
 name: Build Kernel (Redwood)
 
 on:
-  workflow_dispatch: # Memungkinkan kamu menjalankan build secara manual dari tab Actions
+  workflow_dispatch:
   push:
     branches:
       - main
-      - redwood # Sesuaikan dengan branch utama kamu
+      - redwood 
 
 jobs:
   build-kernel:
@@ -25,20 +25,27 @@ jobs:
       - name: Setup AOSP Clang 20 (r547379)
         run: |
           echo "Setting up AOSP Clang 20.0.0 (r547379)..."
+          
+          # Path diubah ke aosp-clang agar cocok dengan GC_DIR di build.sh kamu
           mkdir -p $HOME/toolchains/aosp-clang
           cd $HOME/toolchains/aosp-clang
           
-          # Mengunduh langsung r547379 dari repositori resmi Google Git (Android 15 branch)
-          wget https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/refs/tags/android-15.0.0_r1/clang-r547379.tar.gz
-          tar -xzf clang-r547379.tar.gz
-          rm clang-r547379.tar.gz
+          # Menggunakan Git Partial Clone dari branch main
+          git clone --depth=1 --filter=blob:none --sparse https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86 clang-tmp
+          cd clang-tmp
+          git sparse-checkout set clang-r547379
+          git checkout main
+          
+          # Pindahkan isi folder r547379 ke root toolchain
+          mv clang-r547379/* ../
+          cd ..
+          rm -rf clang-tmp
           
           # Verifikasi versi Clang
           ./bin/clang --version
 
       - name: Run Build Script
         run: |
-          # Pastikan file script build kamu bernama build.sh (ubah jika namanya berbeda)
           chmod +x build.sh
           ./build.sh
 
@@ -47,4 +54,4 @@ jobs:
         with:
           name: Salsa-Kernel-Redwood
           path: /home/runner/AnyKernel3/*.zip
-          compression-level: 0 # File sudah dalam bentuk zip, tidak perlu dikompresi dua kali
+          compression-level: 0
